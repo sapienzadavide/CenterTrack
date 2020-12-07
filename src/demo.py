@@ -18,6 +18,19 @@ image_ext = ['jpg', 'jpeg', 'png', 'webp']
 video_ext = ['mp4', 'mov', 'avi', 'mkv']
 time_stats = ['tot', 'load', 'pre', 'net', 'dec', 'post', 'merge', 'display']
 
+def save_detection_info(image_name, cnt, ret, arch):
+  if not os.path.exists('det_'+arch):
+        os.makedirs('det_'+arch)
+  timage_name = 'det_'+arch+'/'+image_name.split('/')[-1].split('.')[0] + str(cnt) + '.txt'
+  with open(timage_name, 'w') as f:
+    for bbox in ret['results']:
+      if bbox['score'] > 0.3:
+        f.write("{} {} {} {} {} {}\n".format(bbox['class'], bbox['score'], 
+                                            bbox['bbox'][0], 
+                                            bbox['bbox'][1], 
+                                            bbox['bbox'][2]-bbox['bbox'][0], 
+                                            bbox['bbox'][3]-bbox['bbox'][1]))
+
 def demo(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.debug = max(opt.debug, 1)
@@ -51,13 +64,14 @@ def demo(opt):
     out = cv2.VideoWriter('../results/{}.mp4'.format(
       opt.exp_id + '_' + out_name),fourcc, opt.save_framerate, (
         opt.video_w, opt.video_h))
-  
+  print("mo?")
   if opt.debug < 5:
     detector.pause = False
   cnt = 0
   results = {}
 
   while True:
+      print("forse")
       if is_video:
         _, img = cam.read()
         if img is None:
@@ -81,6 +95,9 @@ def demo(opt):
 
       # track or detect the image.
       ret = detector.run(img)
+      if opt.exp_det:
+        print("save detection...")
+        save_detection_info(opt.demo, cnt, ret, opt.arch)
 
       # log run time
       time_str = 'frame {} |'.format(cnt)

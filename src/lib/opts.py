@@ -254,6 +254,14 @@ class opts(object):
     self.parser.add_argument('--custom_dataset_img_path', default='')
     self.parser.add_argument('--custom_dataset_ann_path', default='')
 
+    # exporter
+    self.parser.add_argument('--exp_wo', action='store_true', 
+                             help='export weights and outputs.')
+    self.parser.add_argument('--exp_wo_dim', type=int, default=512, 
+                             help='set the input image dimension to export weights and outputs.')
+    self.parser.add_argument('--exp_det', action='store_true', 
+                             help='export detections.')
+
   def parse(self, args=''):
     if args == '':
       opt = self.parser.parse_args()

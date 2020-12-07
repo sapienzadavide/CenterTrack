@@ -19,6 +19,7 @@ from utils.post_process import generic_post_process
 from utils.debugger import Debugger
 from utils.tracker import Tracker
 from dataset.dataset_factory import get_dataset
+from model.exporter import *
 
 
 class Detector(object):
@@ -50,7 +51,36 @@ class Detector(object):
     self.pre_image_ori = None
     self.tracker = Tracker(opt)
     self.debugger = Debugger(opt=opt, dataset=self.trained_dataset)
+    print(list(self.model.children()))
 
+  def load_ex_image(self, exp_wo_dim):
+    # Download an example image from the pytorch website
+    # url, filename = (
+    #     "https://github.com/pytorch/hub/raw/master/dog.jpg", "dog.jpg")
+    
+    url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
+    try:
+        urllib.URLopener().retrieve(url, filename)
+    except:
+        urllib.request.urlretrieve(url, filename)
+    
+    # sample execution (requires torchvision)
+    input_image = Image.open(filename)
+    preprocess = transforms.Compose([
+        transforms.Resize(exp_wo_dim),
+        transforms.CenterCrop(exp_wo_dim),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
+                             0.229, 0.224, 0.225]),
+    ])
+    input_tensor = preprocess(input_image)
+    # create a mini-batch as expected by the model
+    input_batch = input_tensor.unsqueeze(0)
+    
+    # move the input and model to GPU for speed if available
+    if torch.cuda.is_available():
+        input_batch = input_batch.to('cuda')
+    return input_batch
 
   def run(self, image_or_path_or_tensor, meta={}):
     load_time, pre_time, net_time, dec_time, post_time = 0, 0, 0, 0, 0
@@ -112,6 +142,12 @@ class Detector(object):
       pre_process_time = time.time()
       pre_time += pre_process_time - scale_start_time
       
+      # exports weights
+      if(self.opt.exp_wo):
+        print("exporting weights.....")
+        weights_outputs_exporter(self.model, images, self.pre_images, pre_hms, self.opt.exp_wo_dim)
+        self.opt.exp_wo = False
+
       # run the network
       # output: the output feature maps, only used for visualizing
       # dets: output tensors after extracting peaks
@@ -151,7 +187,7 @@ class Detector(object):
     track_time += tracking_time - end_time
     tot_time += tracking_time - start_time
 
-    if self.opt.debug >= 1:
+    if (self.opt.exp_det == False and self.opt.debug >= 1):
       self.show_results(self.debugger, image, results)
     self.cnt += 1
 
@@ -194,7 +230,7 @@ class Detector(object):
       inp_height, inp_width = self.opt.input_h, self.opt.input_w
       c = np.array([new_width / 2., new_height / 2.], dtype=np.float32)
       s = max(height, width) * 1.0
-      # s = np.array([inp_width, inp_height], dtype=np.float32)
+      s = np.array([inp_width, inp_height], dtype=np.float32)
     else:
       inp_height = (new_height | self.opt.pad) + 1
       inp_width = (new_width | self.opt.pad) + 1
