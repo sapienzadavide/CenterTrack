@@ -141,6 +141,30 @@ for img in images:
 ~~~
 Each `ret` will be a list dict: `[{'bbox': [x1, y1, x2, y2], 'tracking_id': id, ...}]`
 
+## Binaries exporter for weights and outputs
+
+You can export the weights and outputs for each layer of the network. The file format is that used in [tkDNN](https://github.com/ceccocats/tkDNN/).
+So far only dla34 is supported.
+
+You can run:
+
+### dla_34
+~~~
+python demo.py tracking,ddd --load_model ../models/nuScenes_3Dtracking.pth --dataset nuscenes --pre_hm --track_thresh 0.1 --demo /path/to/image/or/folder/or/video/or/webcam --test_focal_length 633 --exp_wo --exp_wo_dim 512 --input_h 512 --input_w 512
+~~~
+
+## Detection exporter
+
+You can export the detection information for a given validation folder. The file format is that used in the mAP of [tkDNN](https://github.com/ceccocats/tkDNN/).
+
+You can run:
+
+### dla_34
+~~~
+python demo.py tracking,ddd --load_model ../models/nuScenes_3Dtracking.pth --dataset nuscenes --pre_hm --track_thresh 0.1 --demo /path/to/image/or/folder/or/video/or/webcam --test_focal_length 633 --exp_det
+~~~
+
+
 ## Training on custom dataset
 
 If you want to train CenterTrack on your own dataset, you can use `--dataset custom` and manually specify the annotation file, image path, input resolutions, and number of categories. You still need to create the annotation files in COCO format (referring to the many `convert_X_to_coco.py` examples in `tools`). For example, you can use the following command to train on our [mot17 experiment](experiments/mot17_half_sc.sh) without using the pre-defined mot dataset file:
