@@ -5,7 +5,40 @@ The code was tested on Ubuntu 16.04, with [Anaconda](https://www.anaconda.com/do
 It should be compatible with PyTorch <=1.4 and python >=0.4 (you will need to switch DCNv2 version for PyTorch <1.0).
 After installing Anaconda:
 
-0. [Optional but highly recommended] create a new conda environment. 
+## Installation from centertrack.yml file:
+
+0. (a) Install [COCOAPI](https://github.com/cocodataset/cocoapi):
+
+    ~~~
+    pip install cython; pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+    ~~~
+
+1. (a) Clone this repo:
+    ~~~
+    CenterTrack_ROOT=/path/to/clone/CenterTrack
+    git clone --recursive https://github.com/xingyizhou/CenterTrack $CenterTrack_ROOT
+    ~~~
+
+    You can manually install the [submodules](../.gitmodules) if you forget `--recursive`.
+
+2. (a) create the conda environment:
+    ~~~
+    cd CenterTrack_ROOT
+    conda env create -f centertrack.yml
+    ~~~
+
+3. (a) Compile deformable convolutional (from [DCNv2](https://github.com/CharlesShang/DCNv2/)).
+
+    ~~~
+    cd $CenterTrack_ROOT/src/lib/model/networks/
+    # git clone https://github.com/CharlesShang/DCNv2/ # clone if it is not automatically downloaded by `--recursive`.
+    cd DCNv2
+    ./make.sh
+    ~~~
+
+## Ufficial installation: 
+
+0. (b) [Optional but highly recommended] create a new conda environment. 
 
     ~~~
     conda create --name CenterTrack python=3.6
@@ -16,20 +49,20 @@ After installing Anaconda:
     conda activate CenterTrack
     ~~~
 
-1. Install PyTorch:
+1. (b) Install PyTorch:
 
     ~~~
     conda install pytorch torchvision -c pytorch
     ~~~
     
 
-2. Install [COCOAPI](https://github.com/cocodataset/cocoapi):
+2. (b) Install [COCOAPI](https://github.com/cocodataset/cocoapi):
 
     ~~~
     pip install cython; pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
     ~~~
 
-3. Clone this repo:
+3. (b) Clone this repo:
 
     ~~~
     CenterTrack_ROOT=/path/to/clone/CenterTrack
@@ -38,14 +71,14 @@ After installing Anaconda:
 
     You can manually install the [submodules](../.gitmodules) if you forget `--recursive`.
 
-4. Install the requirements
+4. (b) Install the requirements
 
     ~~~
     pip install -r requirements.txt
     ~~~
     
     
-5. Compile deformable convolutional (from [DCNv2](https://github.com/CharlesShang/DCNv2/)).
+5. (b) Compile deformable convolutional (from [DCNv2](https://github.com/CharlesShang/DCNv2/)).
 
     ~~~
     cd $CenterTrack_ROOT/src/lib/model/networks/
@@ -54,4 +87,4 @@ After installing Anaconda:
     ./make.sh
     ~~~
 
-6. Download pertained models for [monocular 3D tracking](https://drive.google.com/open?id=1e8zR1m1QMJne-Tjp-2iY_o81hn2CiQRt), [80-category tracking](https://drive.google.com/open?id=1tJCEJmdtYIh8VuN8CClGNws3YO7QGd40), or [pose tracking](https://drive.google.com/open?id=1H0YvFYCOIZ06EzAkC2NxECNQGXxK27hH) and move them to `$CenterTrack_ROOT/models/`. More models can be found in [Model zoo](MODEL_ZOO.md).
+Download pertained models for [monocular 3D tracking](https://drive.google.com/open?id=1e8zR1m1QMJne-Tjp-2iY_o81hn2CiQRt), [80-category tracking](https://drive.google.com/open?id=1tJCEJmdtYIh8VuN8CClGNws3YO7QGd40), or [pose tracking](https://drive.google.com/open?id=1H0YvFYCOIZ06EzAkC2NxECNQGXxK27hH) and move them to `$CenterTrack_ROOT/models/`. More models can be found in [Model zoo](MODEL_ZOO.md).
